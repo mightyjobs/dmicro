@@ -28,6 +28,7 @@ jobs:
         helm repo add flagger https://flagger.app
         helm repo update
         helm upgrade flagger flagger/flagger --namespace flagger-system --create-namespace --set meshProvider=nginx --set metricsServer=http://prometheus:9090
+        cd ..
         kubectl apply -f scripts/kn8s/deployment.yaml
         kubectl apply -f scripts/kn8s/canary/canary.yaml
 
