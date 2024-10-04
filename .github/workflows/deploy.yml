@@ -27,7 +27,7 @@ jobs:
         cd Terraform
         helm repo add flagger https://flagger.app
         helm repo update
-        helm install flagger flagger/flagger --namespace flagger-system --create-namespace --set meshProvider=nginx --set metricsServer=http://prometheus:9090
+        helm upgrade flagger flagger/flagger --namespace flagger-system --create-namespace --set meshProvider=nginx --set metricsServer=http://prometheus:9090
         kubectl apply -f whoami-deployment.yaml
         kubectl apply -f canary-deployment.yaml
 
