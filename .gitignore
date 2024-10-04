@@ -33,3 +33,38 @@ crash.log
 # Ignore sensitive files
 terraform.tfvars
 terraform.tfvars.json
+
+
+# Ignore all Terraform state files
+/Terraform/*.tfstate
+/Terraform/*.tfstate.*
+/Terraform/*.tfstate.backup
+
+# Ignore crash log files
+/Terraform/crash.log
+
+# Ignore Terraform variable files
+/Terraform/*.tfvars
+/Terraform/*.tfvars.json
+
+# Ignore Terraform plan files
+/Terraform/*.tfplan
+
+# Ignore .terraform directories
+/Terraform/.terraform/
+
+# Ignore any IDE or editor files within the Terraform folder
+/Terraform/.idea/
+/Terraform/.vscode/
+/Terraform/*.swp
+/Terraform/*~
+
+# Ignore generated files
+/Terraform/*.zip
+/Terraform/*.tar.gz
+/Terraform/*.tgz
+/Terraform/*.bak
+
+# Ignore sensitive files
+/Terraform/terraform.tfvars
+/Terraform/terraform.tfvars.json
