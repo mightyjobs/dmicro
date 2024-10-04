@@ -68,3 +68,5 @@ terraform.tfvars.json
 # Ignore sensitive files
 /Terraform/terraform.tfvars
 /Terraform/terraform.tfvars.json
+/Terraform/.terraform/
+.terraform/
