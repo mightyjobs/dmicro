@@ -1,26 +1,28 @@
-resource "azurerm_resource_group" "aks" {
-  name     = var.resource_group_name
-  location = var.location
-}
+# Remove this part
+# resource "azurerm_resource_group" "aks" {
+#   name     = var.resource_group_name
+#   location = var.location
+# }
 
+# Virtual network and other resources
 resource "azurerm_virtual_network" "aks" {
   name                = "${var.prefix}-vnet"
-  address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.aks.location
-  resource_group_name = azurerm_resource_group.aks.name
+  address_space       = ["10.2.0.0/16"]
+  location            = var.location                # Use the passed-in variable for location
+  resource_group_name = var.resource_group_name      # Use the passed-in variable for resource group name
 }
 
 resource "azurerm_subnet" "aks" {
   name                 = "${var.prefix}-subnet"
-  resource_group_name  = azurerm_resource_group.aks.name
+  resource_group_name  = var.resource_group_name     # Use the passed-in variable
   virtual_network_name = azurerm_virtual_network.aks.name
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = ["10.2.1.0/24"]
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = "${var.prefix}-aks"
-  location            = azurerm_resource_group.aks.location
-  resource_group_name = azurerm_resource_group.aks.name
+  location            = var.location                # Use the passed-in variable
+  resource_group_name = var.resource_group_name      # Use the passed-in variable
   dns_prefix          = "${var.prefix}-aks"
 
   default_node_pool {
@@ -37,66 +39,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
   network_profile {
     network_plugin    = "azure"
     load_balancer_sku = "standard"
+    service_cidr      = "10.2.2.0/24"
+    dns_service_ip    = "10.2.2.10"
   }
 
   tags = var.tags
-}
-
-resource "azurerm_log_analytics_workspace" "aks" {
-  name                = "${var.prefix}-logs"
-  location            = azurerm_resource_group.aks.location
-  resource_group_name = azurerm_resource_group.aks.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-}
-
-resource "azurerm_monitor_diagnostic_setting" "aks" {
-  name                       = "${var.prefix}-diag"
-  target_resource_id         = azurerm_kubernetes_cluster.aks.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
-
-  log {
-    category = "kube-apiserver"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
-
-  log {
-    category = "kube-controller-manager"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
-
-  log {
-    category = "kube-scheduler"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
-
-  log {
-    category = "kube-audit"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
 }

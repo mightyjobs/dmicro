@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dnmicro
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: whoami-nodejs
+  namespace: dnmicro
 spec:
   replicas: 3
   selector:
@@ -18,11 +24,11 @@ spec:
         ports:
         - containerPort: 8080
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
   name: whoami-nodejs-service
+  namespace: dnmicro
 spec:
   selector:
     app: whoami-nodejs

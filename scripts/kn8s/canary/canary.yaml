@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: whoami
+  namespace: dnmicro
   labels:
     app: whoami
 spec:
@@ -24,6 +25,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: whoami
+  namespace: dnmicro
 spec:
   selector:
     app: whoami
@@ -36,6 +38,7 @@ apiVersion: flagger.app/v1beta1
 kind: Canary
 metadata:
   name: whoami
+  namespace: dnmicro
 spec:
   targetRef:
     apiVersion: apps/v1
@@ -58,16 +61,81 @@ spec:
       thresholdRange:
         max: 500
       interval: 1m
-  webhooks:
-    - name: acceptance-test
-      type: pre-rollout
-      url: http://flagger-loadtester.test/
-      timeout: 30s
-      metadata:
-        type: bash
-        cmd: "curl -sd 'test' http://whoami-canary/status | grep ok"
-    - name: load-test
-      url: http://flagger-loadtester.test/
-      timeout: 5s
-      metadata:
-        cmd: "hey -z 1m -q 10 -c 2 http://whoami-canary/"
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: whoami
+#   namespace: dnmicro
+#   labels:
+#     app: whoami
+# spec:
+#   replicas: 3
+#   selector:
+#     matchLabels:
+#       app: whoami
+#   template:
+#     metadata:
+#       labels:
+#         app: whoami
+#     spec:
+#       containers:
+#       - name: whoami
+#         image: congtaojiang/whoami-nodejs-express
+#         ports:
+#         - containerPort: 8080
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: whoami
+#   namespace: dnmicro
+# spec:
+#   selector:
+#     app: whoami
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 8080
+# ---
+# apiVersion: flagger.app/v1beta1
+# kind: Canary
+# metadata:
+#   name: whoami
+#   namespace: dnmicro
+# spec:
+#   targetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: whoami
+#   service:
+#     port: 80
+#     targetPort: 8080
+#   analysis:
+#     interval: 30s
+#     threshold: 10
+#     maxWeight: 50
+#     stepWeight: 5
+#     metrics:
+#     - name: request-success-rate
+#       thresholdRange:
+#         min: 99
+#       interval: 1m
+#     - name: request-duration
+#       thresholdRange:
+#         max: 500
+#       interval: 1m
+#   webhooks:
+#     - name: acceptance-test
+#       type: pre-rollout
+#       url: http://flagger-loadtester.test/
+#       timeout: 30s
+#       metadata:
+#         type: bash
+#         cmd: "curl -sd 'test' http://whoami-canary/status | grep ok"
+#     - name: load-test
+#       url: http://flagger-loadtester.test/
+#       timeout: 5s
+#       metadata:
+#         cmd: "hey -z 1m -q 10 -c 2 http://whoami-canary/"
